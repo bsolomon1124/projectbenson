@@ -11,3 +11,8 @@ Group 4:
 
 Completed: 11 January 2018
 
+Links:
+- MTA Turnstile Data: [Home](http://web.mta.info/developers/turnstile.html)
+- [Field Descriptions](http://web.mta.info/developers/resources/nyct/turnstile/ts_Field_Description.txt) (effective Oct. 2014)
+- [Remote Unit/Control Area/Station Name Key](http://web.mta.info/developers/resources/nyct/turnstile/Remote-Booth-Station.xls)
+- Table: [Average Weekday Subway Ridership](http://web.mta.info/nyct/facts/ridership/ridership_sub.htm)
