@@ -1,6 +1,8 @@
 # Project Benson
 
-This is the repository for Metis' Project Benson.
+This is the repository for Metis' Project Benson.  Completed: 11 January 2018.
+
+----
 
 Group 4:
 - [Audrey Baker](https://github.com/audreyebaker)
@@ -9,7 +11,6 @@ Group 4:
 - [Kevin Stern](https://github.com/kstern31)
 - [Will Stokvis](https://github.com/stokvis4)
 
-Completed: 11 January 2018
 
 Links:
 - MTA Turnstile Data: [Home](http://web.mta.info/developers/turnstile.html)
