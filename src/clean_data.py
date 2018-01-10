@@ -1,5 +1,4 @@
-"""Find first-discrete-difference ridership from Q2 2017 MTA data."""
-
+"""Find first-discrete-difference ridership from Q1 2017 MTA data."""
 
 import pandas as pd
 
