@@ -14,14 +14,6 @@ FONTSIZE = 20
 SUBSIZE = 14
 FIGSIZE = 8, 6
 
-# MON-THU, weighted, 4-noon only
-mon_thu = totals[totals['DATE_TIME'].dt.weekday < 4]
-mon_thu = mon_thu.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
-    ['weighted'].mean().sort_values(ascending=False)
-mon_thu.to_pickle('mon_thu.pickle')
-# ... TODO ...
-mon_thu.head().plot.barh()
-
 
 # Of the top 100 station-times, how many are in the "Big 3?"
 big = ['GRD CNTRL-42 ST', '34 ST-PENN STA', 'PATH NEW WTC']
@@ -75,8 +67,8 @@ plt.text(15000, 125000, 'Median: %s' % median, fontsize=SUBSIZE)
 plt.text(15000, 100000, 'Skewness: %s' % skew, fontsize=SUBSIZE)
 plt.savefig('hist.png')
 
-
 # Day-of-week figures
+# OLD
 mapping = {
     0: 'Mon',
     1: 'Tue',
@@ -86,21 +78,37 @@ mapping = {
     5: 'Sat',
     6: 'Sun'
     }
-wkdays = totals.nlargest(100, 'NEW_ENTRIES')['DATE_TIME']\
-    .dt.dayofweek.value_counts().reindex(range(0, 7), fill_value=0)\
-    .sort_index(ascending=False)
-wkdays.index = wkdays.index.map(lambda i: mapping[i])
-wkdays.plot.barh(figsize=FIGSIZE)
-plt.title('Occurence of Weekdays within Top 100 Station-Times',
-          fontsize=FONTSIZE)
-plt.xlabel('Number of appearances')
-plt.annotate('Sat. & Sun.: 0 occurrences', xy=(0.5, 0.5), xytext=(5, 1),
-             arrowprops=dict(facecolor='red', shrink=0.05),
+    # wkdays = totals.nlargest(100, 'NEW_ENTRIES')['DATE_TIME']\
+    #     .dt.dayofweek.value_counts().reindex(range(0, 7), fill_value=0)\
+    #     .sort_index(ascending=False)
+    # wkdays.index = wkdays.index.map(lambda i: mapping[i])
+    # wkdays.plot.barh(figsize=FIGSIZE)
+    # plt.title('Occurence of Weekdays within Top 100 Station-Times',
+    #           fontsize=FONTSIZE)
+    # plt.xlabel('Number of appearances')
+    # plt.annotate('Sat. & Sun.: 0 occurrences', xy=(0.5, 0.5), xytext=(5, 1),
+    #              arrowprops=dict(facecolor='red', shrink=0.05),
+    #              fontsize=SUBSIZE)
+    # plt.annotate('Noticeable \n "dropoff" on Fri.', xy=(14, 2), xytext=(17, 1.8),
+    #              arrowprops=dict(facecolor='blue', shrink=0.05),
+    #              fontsize=SUBSIZE)
+    # plt.savefig('wkdays.png')
+
+wkdays = totals.groupby(totals['DATE_TIME'].dt.weekday)['NEW_ENTRIES'].mean()\
+    .multiply(6)
+wkdays.index = wkdays.index.map(lambda f: mapping[f])
+wkdays.plot.bar(figsize=FIGSIZE)
+plt.title('Average Station Ridership by Weekday', fontsize=FONTSIZE)
+plt.xlabel('Weekday', fontsize=SUBSIZE)
+plt.ylabel('Average Daily Ridership', fontsize=SUBSIZE)
+plt.annotate('Noticeable traffic \n decline', xy=(5, 5000),
+             xytext=(4.4, 6000), arrowprops=dict(facecolor='red', shrink=0.05),
              fontsize=SUBSIZE)
-plt.annotate('Noticeable \n "dropoff" on Fri.', xy=(14, 2), xytext=(17, 1.8),
-             arrowprops=dict(facecolor='blue', shrink=0.05),
+plt.annotate('', xy=(6, 4000),
+             xytext=(5.5, 6000), arrowprops=dict(facecolor='red', shrink=0.05),
              fontsize=SUBSIZE)
 plt.savefig('wkdays.png')
+
 
 
 # 3-largest for each weekday/weekend day

@@ -97,9 +97,6 @@ plt.xlabel('Mean Entries', fontsize=SUBSIZE)
 plt.title('Top Station Entrances: Tech Centers', fontsize=FONTSIZE)
 plt.savefig('tech.png')
 
-# avg ridership across system
-# raw ridership, weekdays only
-
 nominal = totals[totals['DATE_TIME'].dt.weekday < 5]
 nominal = nominal.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
     ['NEW_ENTRIES'].mean().sort_values(ascending=False)
