@@ -70,13 +70,13 @@ plt.savefig('hist.png')
 
 # Day-of-week figures
 mapping = {
-    0: 'Monday',
-    1: 'Tuesday',
-    2: 'Wednesday',
-    3: 'Thursday',
-    4: 'Friday',
-    5: 'Saturday',
-    6: 'Sunday'
+    0: 'Mon',
+    1: 'Tue',
+    2: 'Wed',
+    3: 'Thu',
+    4: 'Fri',
+    5: 'Sat',
+    6: 'Sun'
     }
 wkdays = totals.nlargest(100, 'NEW_ENTRIES')['DATE_TIME']\
     .dt.dayofweek.value_counts().reindex(range(0, 7), fill_value=0)\
@@ -130,14 +130,13 @@ plt.savefig('top8cuml.png')
 # Heatmap --
 # Get rid of the issue that PATH WTC didn't run in January;
 #     focus on 1 month.
-march = totals.DATE_TIME.dt.month == 3
+march = (totals.DATE_TIME.dt.month == 3) & (~totals.STATION.isin(big))
+#march = totals.DATE_TIME.dt.month == 3
+
 prds = {
-    'morning': totals[(totals.DATE_TIME.dt.hour == 8) &
-                      march].iloc[:, :5],
-    'aft': totals[(totals.DATE_TIME.dt.hour == 16) &
-                  march].iloc[:, :5],
-    'rush': totals[(totals.DATE_TIME.dt.hour == 20) &
-                   march].iloc[:, :5]
+    'morning': totals[(totals.DATE_TIME.dt.hour == 8) & march],
+    'aft': totals[(totals.DATE_TIME.dt.hour == 16) & march],
+    'rush': totals[(totals.DATE_TIME.dt.hour == 20) & march]
     }
 
 top = dict.fromkeys(prds)
@@ -161,7 +160,7 @@ hms = pd.DataFrame(ccat['STATION'].astype(str).values.reshape(7,3),
 hms.index = hms.index.map(lambda x: mapping[x])  # can't just pass dict
 hm = hms.applymap(lambda x: names[x])
 sns.heatmap(hm, annot=hms.values, linewidths=0.8, cbar=False, fmt='s')
-plt.title('Key Ridership by Day+Time', fontsize=FONTSIZE)
+plt.title('Key Ridership: Day+Time', fontsize=FONTSIZE)
 plt.savefig('heatmap.png')
 
 
