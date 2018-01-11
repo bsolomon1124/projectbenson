@@ -14,6 +14,14 @@ FONTSIZE = 20
 SUBSIZE = 14
 FIGSIZE = 8, 6
 
+# MON-THU, weighted, 4-noon only
+mon_thu = totals[totals['DATE_TIME'].dt.weekday < 4]
+mon_thu = mon_thu.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
+    ['weighted'].mean().sort_values(ascending=False)
+mon_thu.to_pickle('mon_thu.pickle')
+# ... TODO ...
+mon_thu.head().plot.barh()
+
 
 # Of the top 100 station-times, how many are in the "Big 3?"
 big = ['GRD CNTRL-42 ST', '34 ST-PENN STA', 'PATH NEW WTC']
