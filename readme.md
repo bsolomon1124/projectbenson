@@ -1,8 +1,12 @@
 # Project Benson
 
-This is the repository for Metis' Project Benson.  Completed: 11 January 2018.
+Metis - NYC 2018 DS 14 - Project Benson.
 
-----
+Completed: 11 January 2018.
+
+Project repository: [github.com/bsolomon1124/projectbenson](https://github.com/bsolomon1124/projectbenson)
+
+-----
 
 Group 4:
 - [Audrey Baker](https://github.com/audreyebaker)
@@ -12,7 +16,7 @@ Group 4:
 - [Will Stokvis](https://github.com/stokvis4)
 
 
-Links:
+Other links:
 - MTA Turnstile Data: [Home](http://web.mta.info/developers/turnstile.html)
 - [Field Descriptions](http://web.mta.info/developers/resources/nyct/turnstile/ts_Field_Description.txt) (effective Oct. 2014)
 - [Remote Unit/Control Area/Station Name Key](http://web.mta.info/developers/resources/nyct/turnstile/Remote-Booth-Station.xls)
