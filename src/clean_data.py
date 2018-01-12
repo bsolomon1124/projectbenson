@@ -72,14 +72,15 @@ totals.to_pickle('totals.pickle')
 
 # ----
 
+FIGSIZE = 15, 6
+
 # MON-THU, weighted, 4-noon only
 mon_thu = totals[totals['DATE_TIME'].dt.hour.isin([8, 12])]
 mon_thu = totals[totals['DATE_TIME'].dt.weekday < 5]
 mon_thu = mon_thu.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
     ['weighted'].mean().sort_values(ascending=False)
-mon_thu.to_pickle('mon_thu.pickle')
 # ... TODO ...
-mon_thu.head().plot.barh(figsize=FIGSIZE)
+mon_thu.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
 plt.xlabel('Mean Demographic-Wghtd Entries', fontsize=SUBSIZE)
 plt.title('Top Station Entrances: Demographics', fontsize=FONTSIZE)
 plt.savefig('mon_thu.png')
@@ -91,8 +92,7 @@ tech_totals = tech_totals[tech_totals['DATE_TIME'].dt.hour == 20]
 tech_totals = tech_totals[tech_totals['DATE_TIME'].dt.weekday < 5]
 tech_totals = tech_totals.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
     ['NEW_ENTRIES'].mean().sort_values(ascending=False)
-tech_totals.to_pickle('tech_totals.pickle')
-tech_totals.head().plot.barh(figsize=FIGSIZE)
+tech_totals.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
 plt.xlabel('Mean Entries', fontsize=SUBSIZE)
 plt.title('Top Station Entrances: Tech Centers', fontsize=FONTSIZE)
 plt.savefig('tech.png')
@@ -100,8 +100,7 @@ plt.savefig('tech.png')
 nominal = totals[totals['DATE_TIME'].dt.weekday < 5]
 nominal = nominal.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
     ['NEW_ENTRIES'].mean().sort_values(ascending=False)
-nominal.to_pickle('nominal.pickle')
-mon_thu.head().plot.barh(figsize=FIGSIZE)
+mon_thu.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
 plt.xlabel('Mean Entries', fontsize=SUBSIZE)
 plt.title('Top Station Entrances: Nominal Ridership', fontsize=FONTSIZE)
 plt.savefig('nominal.png')
