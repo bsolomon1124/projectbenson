@@ -1,4 +1,4 @@
-"""Exploratory data analysis on Q1 2017 MTA ridership data."""
+"""Exploratory data analysis/vislztn. on Q1 2017 MTA ridership data."""
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,12 +7,15 @@ import seaborn as sns
 
 mpl.rc('xtick', labelsize=13)
 
-mta = pd.read_pickle('mta.pickle')
-totals = pd.read_pickle('totals.pickle')
+pickle_dir = '/Users/brad/Scripts/python/metis/metisgh/projectbenson/pickled/'
+mta = pd.read_pickle(pickle_dir + 'mta.pickle')
+totals = pd.read_pickle(pickle_dir + 'totals.pickle')
 
 FONTSIZE = 20
 SUBSIZE = 14
 FIGSIZE = 8, 6
+
+imgs_dir = pickle_dir.replace('pickled', 'imgs')
 
 
 # Of the top 100 station-times, how many are in the "Big 3?"
@@ -26,7 +29,7 @@ plt.text(0.5, 40, 'Total: %s of 100' % big3.sum(), fontsize=SUBSIZE)
 plt.tight_layout()
 plt.xticks(rotation=0)
 plt.xlabel(fontsize=SUBSIZE)
-plt.savefig('big3.png')
+plt.savefig(imgs_dir + 'big3.png')
 
 
 # Similarly, what does the distribution of popular times look like?
@@ -50,14 +53,12 @@ plt.annotate('Rush hour *entrances* \n dominated by "Big 3"',
              xy=(0.4, 50), xytext=(0.8, 52),
              arrowprops=dict(facecolor='red', shrink=0.05),
              fontsize=SUBSIZE)
-plt.savefig('times.png')
-# (Not surprising because we're dealing with *ENTRIES*)
+plt.savefig(imgs_dir + 'times.png')
 
 
 # Independent of station, what are the most popular four-hour blocks?
-skew = totals['NEW_ENTRIES'].skew().round(2)
-mean = totals['NEW_ENTRIES'].mean().round(2)
-median = totals['NEW_ENTRIES'].median().round(2)
+skew, mean, median = totals['NEW_ENTRIES']\
+  .agg(['skew', 'mean', 'median']).round(2)
 totals.hist(column='NEW_ENTRIES', bins=50)
 plt.title('Histogram: Distribution of 4-Hour Ridership', fontsize=FONTSIZE)
 plt.xlabel('Number of Station Entrants')
@@ -65,10 +66,9 @@ plt.ylabel('Number of Occurences')
 plt.text(15000, 150000, 'Mean: %s' % mean, fontsize=SUBSIZE)
 plt.text(15000, 125000, 'Median: %s' % median, fontsize=SUBSIZE)
 plt.text(15000, 100000, 'Skewness: %s' % skew, fontsize=SUBSIZE)
-plt.savefig('hist.png')
+plt.savefig(imgs_dir + 'hist.png')
 
 # Day-of-week figures
-# OLD
 mapping = {
     0: 'Mon',
     1: 'Tue',
@@ -78,24 +78,8 @@ mapping = {
     5: 'Sat',
     6: 'Sun'
     }
-    # wkdays = totals.nlargest(100, 'NEW_ENTRIES')['DATE_TIME']\
-    #     .dt.dayofweek.value_counts().reindex(range(0, 7), fill_value=0)\
-    #     .sort_index(ascending=False)
-    # wkdays.index = wkdays.index.map(lambda i: mapping[i])
-    # wkdays.plot.barh(figsize=FIGSIZE)
-    # plt.title('Occurence of Weekdays within Top 100 Station-Times',
-    #           fontsize=FONTSIZE)
-    # plt.xlabel('Number of appearances')
-    # plt.annotate('Sat. & Sun.: 0 occurrences', xy=(0.5, 0.5), xytext=(5, 1),
-    #              arrowprops=dict(facecolor='red', shrink=0.05),
-    #              fontsize=SUBSIZE)
-    # plt.annotate('Noticeable \n "dropoff" on Fri.', xy=(14, 2), xytext=(17, 1.8),
-    #              arrowprops=dict(facecolor='blue', shrink=0.05),
-    #              fontsize=SUBSIZE)
-    # plt.savefig('wkdays.png')
-
 wkdays = totals.groupby(totals['DATE_TIME'].dt.weekday)['NEW_ENTRIES'].mean()\
-    .multiply(6)
+    .multiply(6)  # daily, not 4hr, avg.
 wkdays.index = wkdays.index.map(lambda f: mapping[f])
 wkdays.plot.bar(figsize=FIGSIZE)
 plt.title('Average Station Ridership by Weekday', fontsize=FONTSIZE)
@@ -107,21 +91,7 @@ plt.annotate('Noticeable traffic \n decline', xy=(5, 5000),
 plt.annotate('', xy=(6, 4000),
              xytext=(5.5, 6000), arrowprops=dict(facecolor='red', shrink=0.05),
              fontsize=SUBSIZE)
-plt.savefig('wkdays.png')
-
-
-
-# 3-largest for each weekday/weekend day
-# threelargest = totals.groupby(totals['DATE_TIME'].dt.weekday)\
-#     .apply(lambda df: df.nlargest(3, columns='NEW_ENTRIES'))
-#
-# threelargest = totals.groupby([totals['DATE_TIME'].dt.weekday,
-#                                totals['DATE_TIME'].dt.hour])\
-#     .apply(lambda df: df.nlargest(3, columns='NEW_ENTRIES'))
-
-# Dropping duplicates
-totals.drop_duplicates('STATION')[['STATION', 'NEW_ENTRIES']]\
-    .set_index('STATION')[:10].plot.bar()
+plt.savefig(imgs_dir + 'wkdays.png')
 
 
 # Cumulative ridership (big 3)
@@ -131,23 +101,13 @@ cuml.loc[:, big].plot(figsize=FIGSIZE)
 plt.title('Cuml. Ridership: "The Big 3," Q1-17', fontsize=FONTSIZE)
 plt.xlabel('Date')
 plt.ylabel('Cumulative Ridership')
-plt.savefig('big3cuml.png')
+plt.savefig(imgs_dir + 'big3cuml.png')
 
 
-# Cumulative ridership (top 8)
-top8 = cuml.iloc[-1].sort_values(ascending=False).index[:8]
-cuml.loc[:, top8].plot()
-plt.title('Cumulative Ridership: "Top 8 Stations," Q1 2017', fontsize=FONTSIZE)
-plt.xlabel('Date')
-plt.ylabel('Cumulative Ridership')
-plt.savefig('top8cuml.png')
-
-
-# Heatmap --
-# Get rid of the issue that PATH WTC didn't run in January;
-#     focus on 1 month.
+# Heatmap -- "tier2" stations (excl. Big3)
+# Get rid of the issue that PATH WTC didn't run in January
+#     and half of Feb; focus on 1 month (March).
 march = (totals.DATE_TIME.dt.month == 3) & (~totals.STATION.isin(big))
-#march = totals.DATE_TIME.dt.month == 3
 
 prds = {
     'morning': totals[(totals.DATE_TIME.dt.hour == 8) & march],
@@ -159,32 +119,66 @@ top = dict.fromkeys(prds)
 cols = ['LINENAME', 'STATION', 'C/A']
 
 for key in prds:
-    top[key] = \
-    prds[key].groupby([prds[key].DATE_TIME.dt.weekday] + cols)\
+    top[key] = prds[key].groupby([prds[key].DATE_TIME.dt.weekday] + cols)\
         ['NEW_ENTRIES'].mean().reset_index()\
-        .sort_values('NEW_ENTRIES', ascending=False)\
-        .drop_duplicates('DATE_TIME').sort_values('DATE_TIME')
+            .sort_values('NEW_ENTRIES', ascending=False)\
+            .drop_duplicates('DATE_TIME').sort_values('DATE_TIME')
 
 ccat = pd.concat([top[key] for key in prds])
 names = enumerate(ccat.STATION.astype(str).unique().tolist())
 names = {k: v for v, k in names}
-
-hms = pd.DataFrame(ccat['STATION'].astype(str).values.reshape(7,3),
-                   index=range(0,7),
+hms = pd.DataFrame(ccat['STATION'].astype(str).values.reshape(7, 3),
+                   index=range(0, 7),
                    columns=prds.keys())
-
-hms.index = hms.index.map(lambda x: mapping[x])  # can't just pass dict
+hms.index = hms.index.map(lambda x: mapping[x])  # can't just pass dict..
 hm = hms.applymap(lambda x: names[x])
 sns.heatmap(hm, annot=hms.values, linewidths=0.8, cbar=False, fmt='s')
 plt.title('Key Ridership: Day+Time', fontsize=FONTSIZE)
-plt.savefig('heatmap.png')
+plt.savefig(imgs_dir + 'heatmap.png')
 
 
-big3_disc = totals.pivot_table(values='NEW_ENTRIES', columns=['STATION'],
+big3_dist = totals.pivot_table(values='NEW_ENTRIES', columns=['STATION'],
                                index=['DATE_TIME'], aggfunc='first')\
     .loc[:, big]
 fig, ax = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
 for i, station in enumerate(big):
-    sns.distplot(big3_disc[station].dropna(), ax=ax[i], bins=20)
+    sns.distplot(big3_dist[station].dropna(), ax=ax[i], bins=20)
 fig.suptitle('Histogram & KDE for "Big 3" Stations', fontsize=FONTSIZE)
-plt.savefig('kde.png')
+plt.savefig(imgs_dir + 'kde.png')
+
+
+FIGSIZE = 15, 6
+
+
+# Constrain ourselves to morning hours, Mon-Fri.  This is where demographics
+#     matter.  (i.e. you commute from where you live in morning)
+mon_thu = totals[totals['DATE_TIME'].dt.hour.isin([8, 12])]
+mon_thu = totals[totals['DATE_TIME'].dt.weekday < 5]
+mon_thu = mon_thu.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
+    ['weighted'].mean().sort_values(ascending=False)
+# ... TODO ...
+mon_thu.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
+plt.xlabel('Mean Demographic-Wghtd Entries', fontsize=SUBSIZE)
+plt.title('Top Station Entrances: Demographics', fontsize=FONTSIZE)
+plt.savefig(imgs_dir + 'mon_thu.png')
+
+
+techcenters = pd.read_csv('TechCenters.csv', squeeze=True).tolist()
+tech_totals = totals[totals.IDS.isin(techcenters)]
+tech_totals = tech_totals[tech_totals['DATE_TIME'].dt.hour == 20]
+tech_totals = tech_totals[tech_totals['DATE_TIME'].dt.weekday < 5]
+tech_totals = tech_totals.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
+    ['NEW_ENTRIES'].mean().sort_values(ascending=False)
+tech_totals.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
+plt.xlabel('Mean Entries', fontsize=SUBSIZE)
+plt.title('Top Station Entrances: Tech Centers', fontsize=FONTSIZE)
+plt.savefig(imgs_dir + 'tech.png')
+
+
+nominal = totals[totals['DATE_TIME'].dt.weekday < 5]
+nominal = nominal.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
+    ['NEW_ENTRIES'].mean().sort_values(ascending=False)
+mon_thu.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
+plt.xlabel('Mean Entries', fontsize=SUBSIZE)
+plt.title('Top Station Entrances: Nominal Ridership', fontsize=FONTSIZE)
+plt.savefig(imgs_dir + 'nominal.png')

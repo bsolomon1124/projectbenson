@@ -2,6 +2,7 @@
 
 import pandas as pd
 
+
 # Create a (NumPy array of) string representations of dates.
 # We will loop over these to build URLs to the
 #     MTA.info-hosted .txt files.
@@ -34,4 +35,5 @@ mta.drop_duplicates(subset=['C/A', 'UNIT', 'SCP', 'STATION', 'DATE_TIME'],
                     inplace=True)
 
 # Pickle intermediate result for faster retrieval
-mta.to_pickle('mta.pickle')
+pickle_dir = '/Users/brad/Scripts/python/metis/metisgh/projectbenson/pickled/'
+mta.to_pickle(pickle_dir + 'mta.pickle')
