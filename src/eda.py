@@ -113,8 +113,8 @@ cols = ['LINENAME', 'STATION', 'C/A']
 for key in prds:
     top[key] = prds[key].groupby([prds[key].DATE_TIME.dt.weekday] + cols)\
         ['NEW_ENTRIES'].mean().reset_index()\
-            .sort_values('NEW_ENTRIES', ascending=False)\
-            .drop_duplicates('DATE_TIME').sort_values('DATE_TIME')
+        .sort_values('NEW_ENTRIES', ascending=False)\
+        .drop_duplicates('DATE_TIME').sort_values('DATE_TIME')
 
 ccat = pd.concat([top[key] for key in prds])
 names = enumerate(ccat.STATION.astype(str).unique().tolist())
@@ -141,14 +141,13 @@ plt.savefig(imgs_dir + 'kde.png')
 
 FIGSIZE = 15, 6
 
-
 # Constrain ourselves to morning hours, Mon-Fri.  This is where demographics
 #     matter.  (i.e. you commute from where you live in morning)
 mon_thu = totals[totals['DATE_TIME'].dt.hour.isin([8, 12])]
 mon_thu = totals[totals['DATE_TIME'].dt.weekday < 5]
 mon_thu = mon_thu.groupby(['LINENAME', 'STATION', 'C/A'], sort=False)\
     ['weighted'].mean().sort_values(ascending=False)
-# ... TODO ...
+
 mon_thu.head().reset_index(level=0).plot.barh(figsize=FIGSIZE)
 plt.xlabel('Mean Demographic-Wghtd Entries', fontsize=SUBSIZE)
 plt.title('Top Station Entrances: Demographics', fontsize=FONTSIZE)
