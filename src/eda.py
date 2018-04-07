@@ -69,15 +69,7 @@ plt.text(15000, 100000, 'Skewness: %s' % skew, fontsize=SUBSIZE)
 plt.savefig(imgs_dir + 'hist.png')
 
 # Day-of-week figures
-mapping = {
-    0: 'Mon',
-    1: 'Tue',
-    2: 'Wed',
-    3: 'Thu',
-    4: 'Fri',
-    5: 'Sat',
-    6: 'Sun'
-    }
+mapping = dict(enumerate(('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')))
 wkdays = totals.groupby(totals['DATE_TIME'].dt.weekday)['NEW_ENTRIES'].mean()\
     .multiply(6)  # daily, not 4hr, avg.
 wkdays.index = wkdays.index.map(lambda f: mapping[f])
